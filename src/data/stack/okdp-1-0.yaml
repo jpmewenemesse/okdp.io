@@ -597,7 +597,7 @@ components:
       source: https://github.com/OKDP/sandbox-dependencies/blob/main/packages/system/kubauth/kubauth.yaml
     logo: null
   - id: kubocd-webhooks
-    name: KubOCD webhooks
+    name: KuboCD webhooks
     section: dependencies
     upstreamVersion: v0.3.2
     upstreamVersionSource: package tag
@@ -607,7 +607,7 @@ components:
     provenance:
       - upstream-chart
     protected: true
-    description: Admission webhooks backing the KubOCD Release and Context resources.
+    description: Admission webhooks backing the KuboCD Release and Context resources.
     primaryChart: &a42
       name: kubocd-wh
       version: v0.3.2

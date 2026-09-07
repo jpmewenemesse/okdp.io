@@ -37,7 +37,7 @@ npm run preview
 `/stack/<version>` lists every component shipped in an OKDP release, with its
 version, provenance and source links. The data is **generated**, not written by
 hand: `src/data/stack/okdp-1-0.yaml` is produced by `scripts/build-stack.mjs`
-from the KubOCD Package manifests in
+from the KuboCD Package manifests in
 [`platform-packages`](https://github.com/OKDP/platform-packages) and
 [`sandbox-dependencies`](https://github.com/OKDP/sandbox-dependencies).
 

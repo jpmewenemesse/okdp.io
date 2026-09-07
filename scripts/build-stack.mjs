@@ -17,7 +17,7 @@
 /**
  * Builds the OKDP stack inventory consumed by /stack/<version>.
  *
- * Reads the KubOCD Package manifests from the two package repositories and
+ * Reads the KuboCD Package manifests from the two package repositories and
  * flattens them into a single data file. Presentation metadata that cannot be
  * derived (display names, project URLs, logos) lives in stack-metadata.yaml.
  *

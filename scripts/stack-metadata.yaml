@@ -112,8 +112,8 @@ components:
     name: kubauth
     description: OIDC authentication for kubectl against the platform identity provider.
   kubocd-webhooks:
-    name: KubOCD webhooks
-    description: Admission webhooks backing the KubOCD Release and Context resources.
+    name: KuboCD webhooks
+    description: Admission webhooks backing the KuboCD Release and Context resources.
   local-secrets-provider:
     name: Local secrets provider
     description: Generates sandbox credentials in-cluster, standing in for a real vault.
