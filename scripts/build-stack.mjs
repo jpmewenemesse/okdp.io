@@ -330,13 +330,21 @@ function provenanceOf(primary) {
 /**
  * The version a reader cares about: "Trino 480", not the package tag.
  *
- * Package tags are usually `<upstream>-pNN`, but not always: trino carries a
- * SemVer-shaped tag the console's parser requires, and keycloak's tag tracks
- * the Bitnami chart rather than Keycloak itself. Those are named explicitly in
- * stack-metadata.yaml; everything else is derived and cross-checked.
+ * Two tag shapes are supported, so the inventory survives the release-please
+ * migration without a rewrite:
+ *
+ *   <upstream>-pNN       today, e.g. 3.5.1-p08
+ *   <upstream>-X.Y.Z     after the migration, e.g. 3.5.1-1.0.0
+ *
+ * Both carry the upstream version in front, which is the part a reader wants.
+ * Two packages still need naming explicitly in stack-metadata.yaml: trino
+ * carries a SemVer-shaped tag the console's parser requires, and keycloak's tag
+ * tracks the Bitnami chart rather than Keycloak itself.
  */
+const PACKAGE_SUFFIX = /-(?:p\d+|\d+\.\d+\.\d+)$/;
+
 function upstreamVersionOf(pkg, primary, override) {
-  const derived = pkg.tag.replace(/-p\d+$/, "");
+  const derived = pkg.tag.replace(PACKAGE_SUFFIX, "");
   if (override)
     return { version: String(override), source: "metadata override", derived };
 
