@@ -1,0 +1,44 @@
+---
+import ComponentRow from "@/components/stack/ComponentRow.astro";
+import type { HomeTranslations } from "@/i18n/translations";
+import type { LocalizedSection } from "@/types/stack";
+
+interface Props {
+  section: LocalizedSection;
+  content: HomeTranslations;
+}
+
+const { section, content } = Astro.props;
+const columns = content.stackPage.columns;
+---
+
+<section class="mb-12" data-stack-section={section.id}>
+  <div class="mb-4">
+    <h2 class="mb-1 text-2xl font-bold">
+      {section.title}
+      <span class="text-text-light ms-2 text-base font-normal">
+        {section.components.length}
+      </span>
+    </h2>
+    <p class="text-text-light max-w-3xl text-sm">{section.description}</p>
+  </div>
+
+  <div class="border-accent bg-background overflow-hidden rounded-lg border">
+    <!-- Column labels mirror the summary grid; hidden where the row reflows. -->
+    <div
+      class="bg-background-alt border-accent text-text-light hidden border-b px-4 py-2 text-[11px] font-semibold tracking-wide uppercase md:grid md:grid-cols-[minmax(0,2.2fr)_minmax(0,1fr)_minmax(0,1.4fr)_minmax(0,1.5fr)_minmax(0,1.3fr)] md:gap-x-4"
+    >
+      <span class="ps-5">{columns.component}</span>
+      <span>{columns.version}</span>
+      <span>{columns.package}</span>
+      <span>{columns.provenance}</span>
+      <span>{columns.chart}</span>
+    </div>
+
+    {
+      section.components.map((component) => (
+        <ComponentRow component={component} content={content} />
+      ))
+    }
+  </div>
+</section>

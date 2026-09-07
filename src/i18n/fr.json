@@ -10,6 +10,7 @@
     "about": "À propos",
     "architecture": "Architecture",
     "roadmap": "Roadmap",
+    "stack": "Stack",
     "community": "Communauté",
     "documentation": "Docs"
   },
@@ -593,6 +594,74 @@
           ]
         }
       ]
+    }
+  },
+  "stackPage": {
+    "meta": {
+      "title": "Stack OKDP {version} | Open Kubernetes Data Platform",
+      "description": "Tous les composants livrés dans OKDP, avec leur version, leur provenance et un lien vers leur source."
+    },
+    "title": "OKDP {version}",
+    "subtitle": "Tous les composants de cette version, la version livrée et son origine.",
+    "summary": "{total} composants · {upstreamOnly} charts upstream utilisés sans modification",
+    "generatedFrom": "Généré depuis",
+    "sections": {
+      "data-services": {
+        "title": "Services Data & IA",
+        "description": "Les services utilisés au quotidien : moteurs de requêtes, notebooks, orchestration et BI."
+      },
+      "control-plane": {
+        "title": "Control plane",
+        "description": "La couche d'automatisation d'OKDP : le serveur d'API et la console web."
+      },
+      "dependencies": {
+        "title": "Dépendances de la plateforme",
+        "description": "Les services cluster dont OKDP dépend : identité, stockage, certificats et ingress."
+      }
+    },
+    "columns": {
+      "component": "Composant",
+      "version": "Version",
+      "package": "Package",
+      "provenance": "Provenance",
+      "chart": "Chart"
+    },
+    "provenance": {
+      "upstream-chart": {
+        "label": "Chart upstream",
+        "description": "Utilisé tel que publié par le projet upstream, sans modification."
+      },
+      "okdp-chart": {
+        "label": "Chart OKDP",
+        "description": "Chart Helm développé et publié par OKDP."
+      },
+      "okdp-image": {
+        "label": "Image OKDP",
+        "description": "Image conteneur reconstruite par OKDP."
+      }
+    },
+    "filter": {
+      "label": "Filtrer les composants",
+      "placeholder": "Rechercher un composant, une version ou un chart...",
+      "empty": "Aucun composant ne correspond à ce filtre."
+    },
+    "details": {
+      "modules": "Modules inclus",
+      "source": "Définition du package",
+      "upstream": "Projet"
+    },
+    "badges": { "prerelease": "Pré-version" },
+    "copy": { "label": "Copier", "done": "Copié" },
+    "index": {
+      "meta": {
+        "title": "Stacks OKDP | Open Kubernetes Data Platform",
+        "description": "Le contenu de chaque version d'OKDP, composant par composant."
+      },
+      "title": "Stacks OKDP",
+      "subtitle": "Le contenu de chaque version d'OKDP, composant par composant.",
+      "cta": "Voir l'inventaire",
+      "current": "Version actuelle",
+      "components": "composants"
     }
   }
 }

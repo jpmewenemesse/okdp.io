@@ -43,7 +43,7 @@ import {
 import { dirname, join, relative, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
-import { parse, stringify } from "yaml";
+import { parse, stringify, Scalar } from "yaml";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -81,6 +81,16 @@ function parseArgs(argv) {
   return args;
 }
 
+/**
+ * Forces a double-quoted scalar. Without this an ISO date round-trips through
+ * YAML as a timestamp rather than a string, and the collection schema rejects it.
+ */
+function quoted(value) {
+  const scalar = new Scalar(value);
+  scalar.type = Scalar.QUOTE_DOUBLE;
+  return scalar;
+}
+
 function fail(message) {
   console.error(`build-stack: ${message}`);
   process.exit(1);
@@ -109,11 +119,13 @@ function resolveSources({ repos }) {
       execFileSync("git", ["clone", "--depth", "1", "--quiet", repo.url, dir]);
       sources[name] = dir;
     }
-    const head = execFileSync("git", ["-C", sources[name], "rev-parse", "HEAD"])
-      .toString()
-      .trim();
-    console.error(`  ${name} @ ${head.slice(0, 7)}  (${sources[name]})`);
-    sources[name] = { path: sources[name], head };
+    const path = sources[name];
+    const head = git(path, "rev-parse", "HEAD");
+    // The source commit date, not the time the script ran: keeping the output
+    // deterministic is what lets a re-run be diffed to detect drift.
+    const date = git(path, "show", "-s", "--format=%cI", "HEAD");
+    console.error(`  ${name} @ ${head.slice(0, 7)}  (${path})`);
+    sources[name] = { path, head, date };
   }
   return sources;
 }
@@ -275,7 +287,7 @@ const basename = (ref) => (ref ?? "").split("/").pop();
 /**
  * Picks the chart and image that *are* the component, as opposed to the helper
  * modules packaged alongside it. Without this, Airflow reports `oidc-dcr` and
- * Trino reports `internal-secrets` — both plumbing.
+ * Trino reports `internal-secrets`, both of which are plumbing.
  */
 function selectPrimary(pkg, modules, meta) {
   const charts = modules.flatMap((module) => module.charts);
@@ -316,7 +328,7 @@ function provenanceOf(primary) {
 }
 
 /**
- * The version a reader cares about — "Trino 480", not the package tag.
+ * The version a reader cares about: "Trino 480", not the package tag.
  *
  * Package tags are usually `<upstream>-pNN`, but not always: trino carries a
  * SemVer-shaped tag the console's parser requires, and keycloak's tag tracks
@@ -441,7 +453,14 @@ const output = {
     by: "scripts/build-stack.mjs",
     note: "Generated file. Re-run the script instead of editing by hand.",
     sources: Object.fromEntries(
-      Object.entries(sources).map(([name, source]) => [name, source.head]),
+      Object.entries(sources).map(([name, source]) => [
+        name,
+        {
+          sha: source.head,
+          date: source.date ? quoted(source.date.slice(0, 10)) : null,
+          url: `${REPOS[name].url.replace(/\.git$/, "")}/tree/${source.head}`,
+        },
+      ]),
     ),
   },
   components,

@@ -1,0 +1,69 @@
+---
+import type { GetStaticPaths } from "astro";
+import { getRelativeLocaleUrl } from "astro:i18n";
+
+import MarketingLayout from "@/layouts/MarketingLayout.astro";
+import { localeCodes, type Locale } from "@/i18n/config";
+import { getTranslations } from "@/i18n/translations";
+import { getStackEntries } from "@/lib/stack";
+
+export const getStaticPaths = (() => {
+  return localeCodes.map((lang) => ({ params: { lang } }));
+}) satisfies GetStaticPaths;
+
+const locale = Astro.currentLocale as Locale;
+const content = getTranslations(locale);
+const copy = content.stackPage.index;
+
+// Sorted newest first by getStackEntries, so the first entry is the current one.
+const entries = await getStackEntries();
+---
+
+<MarketingLayout
+  content={content}
+  title={copy.meta.title}
+  description={copy.meta.description}
+>
+  <main>
+    <section class="from-accent to-background bg-linear-to-b pt-36 pb-8">
+      <div class="container">
+        <div class="mx-auto max-w-3xl text-center">
+          <h1 class="text-gradient mb-3">{copy.title}</h1>
+          <p class="text-text-light">{copy.subtitle}</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section bg-background">
+      <div class="container">
+        <div class="mx-auto grid max-w-4xl gap-4 md:grid-cols-2">
+          {
+            entries.map((entry, index) => (
+              <a
+                href={getRelativeLocaleUrl(locale, `/stack/${entry.id}`)}
+                class="bg-background border-accent hover:border-primary group block rounded-lg border p-6 no-underline transition-colors"
+              >
+                <div class="mb-2 flex items-center gap-3">
+                  <h2 class="group-hover:text-primary text-xl font-bold transition-colors">
+                    OKDP {entry.data.stack}
+                  </h2>
+                  {index === 0 && (
+                    <span class="bg-primary/10 text-primary rounded-full px-3 py-0.5 text-xs font-semibold">
+                      {copy.current}
+                    </span>
+                  )}
+                </div>
+                <p class="text-text-light mb-4 text-sm">
+                  {entry.data.components.length} {copy.components}
+                </p>
+                <span class="text-primary text-sm font-medium">
+                  {copy.cta} →
+                </span>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+  </main>
+</MarketingLayout>

@@ -32,6 +32,57 @@ npm run build
 npm run preview
 ```
 
+## Stack inventory
+
+`/stack/<version>` lists every component shipped in an OKDP release, with its
+version, provenance and source links. The data is **generated**, not written by
+hand: `src/data/stack/okdp-1-0.yaml` is produced by `scripts/build-stack.mjs`
+from the KubOCD Package manifests in
+[`platform-packages`](https://github.com/OKDP/platform-packages) and
+[`sandbox-dependencies`](https://github.com/OKDP/sandbox-dependencies).
+
+The generator runs when a release is cut, never during `astro build`. Its output
+is committed, so the site build stays offline and deterministic, and every
+version change lands as a reviewable diff.
+
+### Regenerating
+
+```bash
+node scripts/build-stack.mjs --stack 1.0
+git diff src/data/stack/   # expect no change unless a package actually moved
+```
+
+By default it clones both package repositories from `OKDP` at their current
+`main`. To generate from a local checkout instead:
+
+```bash
+node scripts/build-stack.mjs --stack 1.0 \
+  --repo platform-packages=../platform-packages
+```
+
+A local checkout is only safe if it is level with `main`. The generator warns
+when it is not: a stale one parses fine and silently produces a different
+platform. Prefer the default unless you are testing an unmerged change.
+
+### Adding a release
+
+```bash
+node scripts/build-stack.mjs --stack 1.1
+```
+
+This writes `src/data/stack/okdp-1-1.yaml`, and the new route appears
+automatically. Existing stack files are never rewritten, so a shipped inventory
+stays frozen at what that release contained.
+
+### Editing what is shown
+
+Versions, charts, images and provenance are all derived from the package
+manifests. Do not edit the generated file: re-run the script.
+
+Everything that cannot be derived (display names, project homepages, logos, and
+the occasional upstream version a package tag cannot express) lives in
+`scripts/stack-metadata.yaml`. That is the file to edit.
+
 ## Preview deployments from forks
 
 To let contributors share a live preview without deploying anything in the upstream `OKDP` organization, the repository includes a fork-only GitHub Actions workflow in `.github/workflows/preview.yml`.

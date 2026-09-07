@@ -1,0 +1,167 @@
+---
+import type { GetStaticPaths } from "astro";
+
+import StackSection from "@/components/stack/StackSection.astro";
+import MarketingLayout from "@/layouts/MarketingLayout.astro";
+import { localeCodes, type Locale } from "@/i18n/config";
+import { getTranslations } from "@/i18n/translations";
+import { getLocalizedStack, getStackEntries } from "@/lib/stack";
+
+export const getStaticPaths = (async () => {
+  const entries = await getStackEntries();
+  return localeCodes.flatMap((lang) =>
+    entries.map((entry) => ({ params: { lang, version: entry.id } })),
+  );
+}) satisfies GetStaticPaths;
+
+const locale = Astro.currentLocale as Locale;
+const content = getTranslations(locale);
+const copy = content.stackPage;
+
+const { version } = Astro.params;
+const stack = await getLocalizedStack(version!, locale, content);
+// Unreachable: getStaticPaths only emits routes for entries that exist. Fail
+// the build loudly rather than shipping a blank page if that ever changes.
+if (!stack) throw new Error(`No stack entry for '${version}'`);
+
+const title = copy.title.replace("{version}", stack.version);
+const summary = copy.summary
+  .replace("{total}", String(stack.counts.total))
+  .replace("{upstreamOnly}", String(stack.counts.upstreamOnly));
+
+// Provenance for the reader: which commit of each package repo this inventory
+// was built from, dated so it can be judged without decoding a SHA.
+const dateFormat = new Intl.DateTimeFormat(locale, {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+});
+const sources = Object.entries(stack.sources).map(([name, source]) => ({
+  name,
+  url: source.url,
+  sha: source.sha.slice(0, 7),
+  date: source.date
+    ? dateFormat.format(new Date(`${source.date}T00:00:00Z`))
+    : null,
+}));
+---
+
+<MarketingLayout
+  content={content}
+  title={copy.meta.title.replace("{version}", stack.version)}
+  description={copy.meta.description}
+>
+  <main>
+    <section class="from-accent to-background bg-linear-to-b pt-36 pb-8">
+      <div class="container">
+        <div class="mx-auto max-w-3xl text-center">
+          <h1 class="text-gradient mb-3">{title}</h1>
+          <p class="text-text-light mb-4">{copy.subtitle}</p>
+          <p class="text-text-light text-sm font-medium">{summary}</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section bg-background pt-4">
+      <div class="container">
+        <div class="mx-auto max-w-6xl">
+          <div class="mb-8">
+            <label class="sr-only" for="stack-filter">{copy.filter.label}</label
+            >
+            <input
+              id="stack-filter"
+              type="search"
+              autocomplete="off"
+              placeholder={copy.filter.placeholder}
+              class="border-accent bg-background focus:border-primary w-full rounded-lg border px-4 py-2.5 text-sm outline-none md:max-w-md"
+            />
+          </div>
+
+          {
+            stack.sections.map((section) => (
+              <StackSection section={section} content={content} />
+            ))
+          }
+
+          <p
+            class="text-text-light py-10 text-center text-sm"
+            data-stack-empty
+            hidden
+          >
+            {copy.filter.empty}
+          </p>
+
+          <p class="text-text-light border-accent border-t pt-6 text-xs">
+            {copy.generatedFrom}{" "}
+            {
+              sources.map((source, index) => (
+                <>
+                  <a
+                    href={source.url}
+                    class="text-primary font-mono hover:underline"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    {source.name}@{source.sha}
+                  </a>
+                  {source.date && ` (${source.date})`}
+                  {index < sources.length - 1 ? ", " : "."}
+                </>
+              ))
+            }
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+</MarketingLayout>
+
+<script>
+  // Progressive enhancement: without JS every component is already visible and
+  // every row still expands, because the rows are <details> elements.
+  const filter = document.querySelector<HTMLInputElement>("#stack-filter");
+  const rows = Array.from(
+    document.querySelectorAll<HTMLDetailsElement>("[data-component]"),
+  );
+  const sections = Array.from(
+    document.querySelectorAll<HTMLElement>("[data-stack-section]"),
+  );
+  const empty = document.querySelector<HTMLElement>("[data-stack-empty]");
+
+  function applyFilter(term: string) {
+    const needle = term.trim().toLowerCase();
+    for (const row of rows) {
+      const match = !needle || (row.dataset.search ?? "").includes(needle);
+      row.hidden = !match;
+      if (!match) row.open = false;
+    }
+    let anyVisible = false;
+    for (const section of sections) {
+      const visible = Array.from(
+        section.querySelectorAll<HTMLDetailsElement>("[data-component]"),
+      ).some((row) => !row.hidden);
+      section.hidden = !visible;
+      anyVisible ||= visible;
+    }
+    if (empty) empty.hidden = anyVisible;
+  }
+
+  filter?.addEventListener("input", () => applyFilter(filter.value));
+
+  for (const button of document.querySelectorAll<HTMLButtonElement>(
+    "[data-copy]",
+  )) {
+    button.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(button.dataset.copy ?? "");
+        button.textContent = button.dataset.copyDone ?? "Copied";
+        setTimeout(() => {
+          button.textContent = button.dataset.copyLabel ?? "Copy";
+        }, 1500);
+      } catch {
+        // Clipboard is unavailable (insecure context, denied permission).
+        // The reference stays selectable next to the button.
+      }
+    });
+  }
+</script>

@@ -13,6 +13,7 @@ const { content, desktop = false, mobile = false } = Astro.props;
 const locale = (Astro.currentLocale ?? defaultLocale) as Locale;
 const homeUrl = getRelativeLocaleUrl(locale, "/");
 const docsUrl = getRelativeLocaleUrl(locale, "/guides/example");
+const stackUrl = getRelativeLocaleUrl(locale, "/stack/");
 const isHome =
   Astro.url.pathname === "/" ||
   Astro.url.pathname === homeUrl ||
@@ -53,6 +54,14 @@ const homeSectionUrl = (section: string) =>
         class="hover:text-primary focus-visible:text-primary block rounded-lg px-3 py-2 whitespace-nowrap text-inherit no-underline transition-colors duration-200 hover:bg-current/8 focus-visible:bg-current/8"
       >
         {content.nav.roadmap}
+      </a>
+    </li>
+    <li>
+      <a
+        href={stackUrl}
+        class="hover:text-primary focus-visible:text-primary block rounded-lg px-3 py-2 whitespace-nowrap text-inherit no-underline transition-colors duration-200 hover:bg-current/8 focus-visible:bg-current/8"
+      >
+        {content.nav.stack}
       </a>
     </li>
 

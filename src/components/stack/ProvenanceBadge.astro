@@ -1,0 +1,30 @@
+---
+import type { HomeTranslations } from "@/i18n/translations";
+import type { Provenance } from "@/types/stack";
+
+interface Props {
+  provenance: Provenance;
+  content: HomeTranslations;
+}
+
+const { provenance, content } = Astro.props;
+const copy = content.stackPage.provenance[provenance];
+
+// Upstream is the neutral, expected case; OKDP-authored is what a reader is
+// scanning for, so only those two carry colour.
+const styles: Record<Provenance, string> = {
+  "upstream-chart": "border-accent text-text-light",
+  "okdp-chart": "border-primary/30 bg-primary/10 text-primary",
+  "okdp-image": "border-primary/30 bg-primary/10 text-primary",
+};
+---
+
+<span
+  class:list={[
+    "inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] leading-tight whitespace-nowrap",
+    styles[provenance],
+  ]}
+  title={copy.description}
+>
+  {copy.label}
+</span>

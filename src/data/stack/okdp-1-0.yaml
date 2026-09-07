@@ -3,8 +3,14 @@ generated:
   by: scripts/build-stack.mjs
   note: Generated file. Re-run the script instead of editing by hand.
   sources:
-    platform-packages: 082e702722bcc395a2930bbd46f732c4486041c4
-    sandbox-dependencies: 12bb63ac6d11b8b17bb3a4f8bbe4f04e2e477063
+    platform-packages:
+      sha: 082e702722bcc395a2930bbd46f732c4486041c4
+      date: "2026-09-04"
+      url: https://github.com/OKDP/platform-packages/tree/082e702722bcc395a2930bbd46f732c4486041c4
+    sandbox-dependencies:
+      sha: 12bb63ac6d11b8b17bb3a4f8bbe4f04e2e477063
+      date: "2026-08-28"
+      url: https://github.com/OKDP/sandbox-dependencies/tree/12bb63ac6d11b8b17bb3a4f8bbe4f04e2e477063
 components:
   - id: airflow
     name: Apache Airflow
