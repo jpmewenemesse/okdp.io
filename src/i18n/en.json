@@ -595,10 +595,10 @@
     "title": "OKDP {version}",
     "subtitle": "Every component in this release, the version it ships, and where it comes from.",
     "summary": "{total} components · {upstreamOnly} upstream charts used unmodified",
-    "generatedFrom": "Generated from",
+    "generatedFrom": "Built from",
     "sections": {
       "data-services": {
-        "title": "Data & AI services",
+        "title": "Data services",
         "description": "The services users run: query engines, notebooks, orchestration and BI."
       },
       "control-plane": {

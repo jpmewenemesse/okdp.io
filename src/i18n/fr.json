@@ -604,10 +604,10 @@
     "title": "OKDP {version}",
     "subtitle": "Tous les composants de cette version, la version livrée et son origine.",
     "summary": "{total} composants · {upstreamOnly} charts upstream utilisés sans modification",
-    "generatedFrom": "Généré depuis",
+    "generatedFrom": "Construit à partir de",
     "sections": {
       "data-services": {
-        "title": "Services Data & IA",
+        "title": "Services Data",
         "description": "Les services utilisés au quotidien : moteurs de requêtes, notebooks, orchestration et BI."
       },
       "control-plane": {
