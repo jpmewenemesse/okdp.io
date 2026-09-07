@@ -1,0 +1,129 @@
+#
+# Copyright 2026 The OKDP Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+
+# Presentation metadata for the stack inventory. Everything here is curated by
+# hand because it cannot be derived from the Package manifests: display names,
+# project homepages, logos.
+#
+# `upstreamVersion` is an escape hatch, used only where the package tag does not
+# carry the version a reader expects. Each one needs a comment saying why.
+# build-stack.mjs warns when a package has no entry here.
+
+components:
+  # ------------------------------------------------------------ data services
+  airflow:
+    name: Apache Airflow
+    upstream: https://airflow.apache.org
+    logo: airflow.svg
+  hive-metastore:
+    name: Hive Metastore
+    upstream: https://hive.apache.org
+  jupyterhub:
+    name: JupyterHub
+    upstream: https://jupyter.org
+    logo: jupyter.svg
+  okdp-examples:
+    name: OKDP Examples
+    upstream: https://github.com/OKDP/okdp-examples
+    description: Reference notebooks, datasets and OPA policies used by the sandbox.
+  polaris:
+    name: Apache Polaris
+    upstream: https://polaris.apache.org
+    logo: polaris.svg
+  spark-defaults:
+    name: Spark Defaults
+    description: Shared Spark configuration applied to every Spark application.
+  spark-history-server:
+    name: Spark History Server
+    upstream: https://spark.apache.org
+    logo: spark.svg
+  spark-operator:
+    name: Spark Operator
+    upstream: https://github.com/kubeflow/spark-operator
+    logo: spark.svg
+  spark-rbac:
+    name: Spark RBAC
+    logo: spark.svg
+    description: Namespace roles and bindings letting Spark applications run in a project.
+  superset:
+    name: Apache Superset
+    upstream: https://superset.apache.org
+    logo: superset.svg
+  trino:
+    name: Trino
+    upstream: https://trino.io
+    logo: trino.svg
+    # The package tag is SemVer-shaped (480.0.0-pNN) because the console's
+    # version parser requires it. Trino itself versions as a plain integer.
+    upstreamVersion: "480"
+
+  # ------------------------------------------------------------ control plane
+  okdp-control-plane-server:
+    name: OKDP Control Plane Server
+    upstream: https://github.com/OKDP/okdp-control-plane-server
+  okdp-control-plane-ui:
+    name: OKDP Control Plane Console
+    upstream: https://github.com/OKDP/okdp-control-plane-ui
+
+  # -------------------------------------------------------------- dependencies
+  cert-manager:
+    name: cert-manager
+    upstream: https://cert-manager.io
+  cloudnative-pg:
+    name: CloudNativePG
+    upstream: https://cloudnative-pg.io
+  cnpg-postgresql:
+    name: PostgreSQL
+    upstream: https://www.postgresql.org
+    description: PostgreSQL clusters provisioned through CloudNativePG.
+  coredns-patch:
+    name: CoreDNS patch
+    upstream: https://coredns.io
+    description: Rewrites cluster DNS so platform hostnames resolve inside the sandbox.
+  dns-server:
+    name: DNS server
+    description: dnsmasq resolver serving the sandbox ingress suffix.
+  external-secrets:
+    name: External Secrets Operator
+    upstream: https://external-secrets.io
+  ingress-nginx:
+    name: Ingress NGINX
+    upstream: https://github.com/kubernetes/ingress-nginx
+  keycloak:
+    name: Keycloak
+    upstream: https://www.keycloak.org
+    # The package tag tracks the Bitnami chart (24.4.11), not Keycloak. The
+    # version users care about is the one in the image OKDP rebuilds.
+    upstreamVersion: 26.1.3
+  kubauth:
+    name: kubauth
+    description: OIDC authentication for kubectl against the platform identity provider.
+  kubocd-webhooks:
+    name: KubOCD webhooks
+    description: Admission webhooks backing the KubOCD Release and Context resources.
+  local-secrets-provider:
+    name: Local secrets provider
+    description: Generates sandbox credentials in-cluster, standing in for a real vault.
+  seaweedfs:
+    name: SeaweedFS
+    upstream: https://github.com/seaweedfs/seaweedfs
+    description: S3-compatible object store backing the lakehouse in the sandbox.
+  tools:
+    name: Platform tools
+    description: Reloader, kubernetes-replicator and secret-generator, bundled as one package.
+  vault:
+    name: HashiCorp Vault
+    upstream: https://www.vaultproject.io
