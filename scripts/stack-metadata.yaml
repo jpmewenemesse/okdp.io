@@ -16,7 +16,7 @@
 
 # Presentation metadata for the stack inventory. Everything here is curated by
 # hand because it cannot be derived from the Package manifests: display names,
-# project homepages, logos.
+# project homepages.
 #
 # `upstreamVersion` is an escape hatch, used only where the package tag does not
 # carry the version a reader expects. Each one needs a comment saying why.
@@ -27,14 +27,12 @@ components:
   airflow:
     name: Apache Airflow
     upstream: https://airflow.apache.org
-    logo: airflow.svg
   hive-metastore:
     name: Hive Metastore
     upstream: https://hive.apache.org
   jupyterhub:
     name: JupyterHub
     upstream: https://jupyter.org
-    logo: jupyter.svg
   okdp-examples:
     name: OKDP Examples
     upstream: https://github.com/OKDP/okdp-examples
@@ -42,30 +40,24 @@ components:
   polaris:
     name: Apache Polaris
     upstream: https://polaris.apache.org
-    logo: polaris.svg
   spark-defaults:
     name: Spark Defaults
     description: Shared Spark configuration applied to every Spark application.
   spark-history-server:
     name: Spark History Server
     upstream: https://spark.apache.org
-    logo: spark.svg
   spark-operator:
     name: Spark Operator
     upstream: https://github.com/kubeflow/spark-operator
-    logo: spark.svg
   spark-rbac:
     name: Spark RBAC
-    logo: spark.svg
     description: Namespace roles and bindings letting Spark applications run in a project.
   superset:
     name: Apache Superset
     upstream: https://superset.apache.org
-    logo: superset.svg
   trino:
     name: Trino
     upstream: https://trino.io
-    logo: trino.svg
     # The package tag is SemVer-shaped (480.0.0-pNN) because the console's
     # version parser requires it. Trino itself versions as a plain integer.
     upstreamVersion: "480"

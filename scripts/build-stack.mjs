@@ -19,7 +19,7 @@
  *
  * Reads the KuboCD Package manifests from the two package repositories and
  * flattens them into a single data file. Presentation metadata that cannot be
- * derived (display names, project URLs, logos) lives in stack-metadata.yaml.
+ * derived (display names, project URLs) lives in stack-metadata.yaml.
  *
  * This runs when a release is cut, not during `astro build`. Its output is
  * committed, so the site build stays offline and every version change shows up
@@ -428,7 +428,6 @@ function collect(sources, metadata) {
           upstream: meta.upstream ?? null,
           source: `https://github.com/OKDP/${repoName}/blob/main/${relative(sources[repoName].path, file)}`,
         },
-        logo: meta.logo ?? null,
       });
     }
   }

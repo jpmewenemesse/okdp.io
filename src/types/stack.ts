@@ -42,7 +42,6 @@ export interface StackComponent {
   images: ImageRef[];
   modules: ModuleRef[];
   links: { upstream: string | null; source: string };
-  logo: string | null;
 }
 
 export interface StackSource {
