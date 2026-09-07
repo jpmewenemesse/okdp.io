@@ -25,8 +25,9 @@
  * committed, so the site build stays offline and every version change shows up
  * as a reviewable diff.
  *
+ * Clones the package repos from OKDP unless --repo names a local checkout.
+ *
  *   node scripts/build-stack.mjs --stack 1.0
- *   node scripts/build-stack.mjs --stack 1.0 --clone
  *   node scripts/build-stack.mjs --stack 1.0 --repo platform-packages=../platform-packages
  */
 
@@ -65,12 +66,11 @@ const OKDP_IMAGE_PREFIXES = ["quay.io/okdp/", "okdp/"];
 // ---------------------------------------------------------------- arguments
 
 function parseArgs(argv) {
-  const args = { stack: null, clone: false, repos: {}, out: null };
+  const args = { stack: null, repos: {}, out: null };
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === "--stack") args.stack = argv[++i];
     else if (arg === "--out") args.out = argv[++i];
-    else if (arg === "--clone") args.clone = true;
     else if (arg === "--repo") {
       const [name, path] = argv[++i].split("=");
       if (!REPOS[name]) fail(`unknown repo '${name}'`);
@@ -88,25 +88,26 @@ function fail(message) {
 
 // ------------------------------------------------------------------ sources
 
-/** Resolves each package repo to a local checkout, cloning when asked to. */
-function resolveSources({ clone, repos }) {
+/**
+ * Resolves each package repo to a local checkout.
+ *
+ * Clones from OKDP by default so the inventory always reflects the canonical
+ * repositories. A local checkout has to be named explicitly with --repo, and
+ * is checked against the expected origin: generating the public inventory from
+ * someone's fork would be silent and wrong.
+ */
+function resolveSources({ repos }) {
   const sources = {};
   for (const [name, repo] of Object.entries(REPOS)) {
     if (repos[name]) {
+      if (!exists(repos[name])) fail(`no checkout at ${repos[name]}`);
       sources[name] = repos[name];
-    } else if (clone) {
+      checkLocal(name, repos[name], repo.url);
+    } else {
       const dir = join(mkdtempSync(join(tmpdir(), "okdp-stack-")), name);
       console.error(`  cloning ${name}…`);
       execFileSync("git", ["clone", "--depth", "1", "--quiet", repo.url, dir]);
       sources[name] = dir;
-    } else {
-      const sibling = resolve(ROOT, "..", name);
-      if (!exists(sibling)) {
-        fail(
-          `no checkout for '${name}'. Pass --clone, or --repo ${name}=<path>`,
-        );
-      }
-      sources[name] = sibling;
     }
     const head = execFileSync("git", ["-C", sources[name], "rev-parse", "HEAD"])
       .toString()
@@ -123,6 +124,59 @@ function exists(path) {
     return true;
   } catch {
     return false;
+  }
+}
+
+function remoteOf(path) {
+  try {
+    return execFileSync("git", ["-C", path, "remote", "get-url", "origin"], {
+      stdio: ["ignore", "pipe", "ignore"],
+    })
+      .toString()
+      .trim();
+  } catch {
+    return null;
+  }
+}
+
+/** Compares remotes ignoring protocol, credentials and a trailing .git. */
+const sameRepo = (a, b) =>
+  a.replace(/^.*github\.com[:/]/, "").replace(/\.git$/, "") ===
+  b.replace(/^.*github\.com[:/]/, "").replace(/\.git$/, "");
+
+function git(path, ...args) {
+  try {
+    return execFileSync("git", ["-C", path, ...args], {
+      stdio: ["ignore", "pipe", "ignore"],
+    })
+      .toString()
+      .trim();
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * A local checkout is only safe to generate from if it points at the OKDP repo
+ * *and* is level with its main branch. A stale checkout is the dangerous case:
+ * it parses fine and silently yields the wrong inventory.
+ */
+function checkLocal(name, path, url) {
+  const origin = remoteOf(path);
+  if (origin && !sameRepo(origin, url)) {
+    console.error(`  warn: ${name} origin is ${origin}, expected ${url}`);
+  }
+  const head = git(path, "rev-parse", "HEAD");
+  const remoteMain = git(path, "ls-remote", url, "refs/heads/main")?.split(
+    /\s+/,
+  )[0];
+  if (head && remoteMain && head !== remoteMain) {
+    const behind = git(path, "rev-list", "--count", `${head}..${remoteMain}`);
+    console.error(
+      `  warn: ${name} is not level with main (${head.slice(0, 7)} vs ${remoteMain.slice(0, 7)}` +
+        (behind && behind !== "0" ? `, ${behind} commits behind` : "") +
+        `). Drop --repo to clone the canonical repository.`,
+    );
   }
 }
 
