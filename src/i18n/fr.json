@@ -615,7 +615,7 @@
         "description": "La couche d'automatisation d'OKDP : le serveur d'API et la console web."
       },
       "dependencies": {
-        "title": "Dépendances de la plateforme",
+        "title": "Dépendances de la sandbox",
         "description": "Les services cluster dont OKDP dépend : identité, stockage, certificats et ingress."
       }
     },

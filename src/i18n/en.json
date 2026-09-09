@@ -606,7 +606,7 @@
         "description": "OKDP's own automation layer: the API server and the web console."
       },
       "dependencies": {
-        "title": "Platform dependencies",
+        "title": "Sandbox dependencies",
         "description": "Cluster services OKDP relies on: identity, storage, certificates and ingress."
       }
     },
