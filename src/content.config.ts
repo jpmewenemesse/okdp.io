@@ -86,7 +86,12 @@ const stacks = defineCollection({
           upstream: z.string().nullable(),
           source: z.string(),
         }),
-        logo: z.string().nullable(),
+        notice: z
+          .object({
+            level: z.enum(["info", "warning"]),
+            key: z.string(),
+          })
+          .nullable(),
       }),
     ),
   }),

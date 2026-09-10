@@ -58,19 +58,18 @@ components:
         images: []
     links:
       upstream: https://airflow.apache.org
-      source: https://github.com/OKDP/platform-packages/blob/main/packages/services/airflow/airflow.yaml
-    logo: airflow.svg
+      source: https://github.com/OKDP/platform-packages/blob/082e702722bcc395a2930bbd46f732c4486041c4/packages/services/airflow/airflow.yaml
+    notice: null
   - id: polaris
     name: Apache Polaris
     section: data-services
     upstreamVersion: 1.3.0-incubating
-    upstreamVersionSource: package tag
+    upstreamVersionSource: image docker.io/apache/polaris
     package:
       repository: quay.io/okdp/platform-packages/polaris
       tag: 1.3.0-incubating-p07
     provenance:
       - upstream-chart
-      - okdp-image
     protected: false
     description: Apache Polaris is an open-source, fully-featured catalog for Apache Iceberg™.
     primaryChart: &a4
@@ -79,8 +78,8 @@ components:
       repository: https://downloads.apache.org/incubator/polaris/helm-chart/
       origin: upstream
     primaryImage: &a5
-      repository: quay.io/okdp/polaris-console
-      tag: v0.1.1
+      repository: docker.io/apache/polaris
+      tag: 1.3.0-incubating
     charts:
       - &a6
         name: polaris-admin
@@ -100,12 +99,15 @@ components:
         origin: okdp
     images:
       - &a7
-        repository: apache/polaris-admin-tool
+        repository: docker.io/apache/polaris-admin-tool
         tag: 1.3.0-incubating
-      - &a9
-        repository: curlimages/curl
-        tag: 8.18.0
       - *a5
+      - &a9
+        repository: docker.io/curlimages/curl
+        tag: 8.18.0
+      - &a11
+        repository: quay.io/okdp/polaris-console
+        tag: v0.1.1
     modules:
       - name: bootstrap
         charts:
@@ -115,7 +117,8 @@ components:
       - name: main
         charts:
           - *a4
-        images: []
+        images:
+          - *a5
       - name: principals
         charts:
           - *a8
@@ -125,11 +128,11 @@ components:
         charts:
           - *a10
         images:
-          - *a5
+          - *a11
     links:
       upstream: https://polaris.apache.org
-      source: https://github.com/OKDP/platform-packages/blob/main/packages/services/polaris/polaris.yaml
-    logo: polaris.svg
+      source: https://github.com/OKDP/platform-packages/blob/082e702722bcc395a2930bbd46f732c4486041c4/packages/services/polaris/polaris.yaml
+    notice: null
   - id: superset
     name: Apache Superset
     section: data-services
@@ -143,49 +146,49 @@ components:
       - okdp-image
     protected: false
     description: Enterprise business intelligence platform for modern data teams.
-    primaryChart: &a11
+    primaryChart: &a12
       name: superset
       version: 0.15.2-2.0
       repository: quay.io/okdp/charts/superset
       origin: okdp
-    primaryImage: &a12
+    primaryImage: &a13
       repository: quay.io/okdp/superset
       tag: 6.0.0
     charts:
-      - &a13
+      - &a14
         name: internal-secrets
         version: null
         repository: null
         origin: local
-      - *a11
-    images:
       - *a12
-      - &a14
-        repository: quay.io/okdp/superset
-        tag: 6.0.0-dockerize
+    images:
+      - *a13
       - &a15
         repository: quay.io/okdp/superset
-        tag: 6.0.0-websocket
+        tag: 6.0.0-dockerize
       - &a16
-        repository: postgres
+        repository: quay.io/okdp/superset
+        tag: 6.0.0-websocket
+      - &a17
+        repository: docker.io/library/postgres
         tag: 16-alpine
     modules:
       - name: internal-secrets
         charts:
-          - *a13
+          - *a14
         images: []
       - name: main
         charts:
-          - *a11
-        images:
           - *a12
-          - *a14
+        images:
+          - *a13
           - *a15
           - *a16
+          - *a17
     links:
       upstream: https://superset.apache.org
-      source: https://github.com/OKDP/platform-packages/blob/main/packages/services/superset/superset.yaml
-    logo: superset.svg
+      source: https://github.com/OKDP/platform-packages/blob/082e702722bcc395a2930bbd46f732c4486041c4/packages/services/superset/superset.yaml
+    notice: null
   - id: cert-manager
     name: cert-manager
     section: dependencies
@@ -198,20 +201,20 @@ components:
       - upstream-chart
     protected: true
     description: null
-    primaryChart: &a17
+    primaryChart: &a18
       name: cert-manager
       version: v1.17.1
       repository: https://charts.jetstack.io
       origin: upstream
     primaryImage: null
     charts:
-      - *a17
-      - &a18
+      - *a18
+      - &a19
         name: trust-manager
         version: v0.16.0
         repository: https://charts.jetstack.io
         origin: upstream
-      - &a19
+      - &a20
         name: cert-issuers
         version: 0.2.0
         repository: quay.io/okdp/charts/cert-issuers
@@ -220,25 +223,25 @@ components:
     modules:
       - name: main
         charts:
-          - *a17
+          - *a18
         images: []
       - name: trust
         charts:
-          - *a18
+          - *a19
         images: []
       - name: issuers
         charts:
-          - *a19
+          - *a20
         images: []
     links:
       upstream: https://cert-manager.io
-      source: https://github.com/OKDP/sandbox-dependencies/blob/main/packages/system/cert-manager/cert-manager.yaml
-    logo: null
+      source: https://github.com/OKDP/sandbox-dependencies/blob/12bb63ac6d11b8b17bb3a4f8bbe4f04e2e477063/packages/system/cert-manager/cert-manager.yaml
+    notice: null
   - id: cloudnative-pg
     name: CloudNativePG
     section: dependencies
     upstreamVersion: 1.29.1
-    upstreamVersionSource: package tag
+    upstreamVersionSource: image ghcr.io/cloudnative-pg/cloudnative-pg
     package:
       repository: quay.io/okdp/sandbox-dependencies/cloudnative-pg
       tag: 1.29.1-p01
@@ -246,24 +249,28 @@ components:
       - upstream-chart
     protected: false
     description: CloudNativePG is the Kubernetes operator that covers the full lifecycle of a highly available PostgreSQL database cluster
-    primaryChart: &a20
+    primaryChart: &a21
       name: cloudnative-pg
       version: 0.28.0
       repository: https://cloudnative-pg.github.io/charts/
       origin: upstream
-    primaryImage: null
+    primaryImage: &a22
+      repository: ghcr.io/cloudnative-pg/cloudnative-pg
+      tag: 1.29.1
     charts:
-      - *a20
-    images: []
+      - *a21
+    images:
+      - *a22
     modules:
       - name: main
         charts:
-          - *a20
-        images: []
+          - *a21
+        images:
+          - *a22
     links:
       upstream: https://cloudnative-pg.io
-      source: https://github.com/OKDP/sandbox-dependencies/blob/main/packages/system/cloudnative-pg/cloudnative-pg.yaml
-    logo: null
+      source: https://github.com/OKDP/sandbox-dependencies/blob/12bb63ac6d11b8b17bb3a4f8bbe4f04e2e477063/packages/system/cloudnative-pg/cloudnative-pg.yaml
+    notice: null
   - id: coredns-patch
     name: CoreDNS patch
     section: dependencies
@@ -277,28 +284,28 @@ components:
       - okdp-image
     protected: false
     description: Rewrites cluster DNS so platform hostnames resolve inside the sandbox.
-    primaryChart: &a21
+    primaryChart: &a23
       name: coredns-patch
       version: 0.1.0
       repository: quay.io/okdp/charts/coredns-patch
       origin: okdp
-    primaryImage: &a22
+    primaryImage: &a24
       repository: quay.io/okdp/sandbox-images/kubectl
       tag: latest
     charts:
-      - *a21
+      - *a23
     images:
-      - *a22
+      - *a24
     modules:
       - name: main
         charts:
-          - *a21
+          - *a23
         images:
-          - *a22
+          - *a24
     links:
       upstream: https://coredns.io
-      source: https://github.com/OKDP/sandbox-dependencies/blob/main/packages/system/coredns-patch/coredns-patch.yaml
-    logo: null
+      source: https://github.com/OKDP/sandbox-dependencies/blob/12bb63ac6d11b8b17bb3a4f8bbe4f04e2e477063/packages/system/coredns-patch/coredns-patch.yaml
+    notice: null
   - id: dns-server
     name: DNS server
     section: dependencies
@@ -311,28 +318,28 @@ components:
       - okdp-chart
     protected: false
     description: dnsmasq resolver serving the sandbox ingress suffix.
-    primaryChart: &a23
+    primaryChart: &a25
       name: dns-server
       version: 1.0.0
       repository: quay.io/okdp/charts/dns-server
       origin: okdp
-    primaryImage: &a24
-      repository: 4km3/dnsmasq
+    primaryImage: &a26
+      repository: docker.io/4km3/dnsmasq
       tag: 2.90-r3
     charts:
-      - *a23
+      - *a25
     images:
-      - *a24
+      - *a26
     modules:
       - name: main
         charts:
-          - *a23
+          - *a25
         images:
-          - *a24
+          - *a26
     links:
       upstream: null
-      source: https://github.com/OKDP/sandbox-dependencies/blob/main/packages/system/dns-server/dns-server.yaml
-    logo: null
+      source: https://github.com/OKDP/sandbox-dependencies/blob/12bb63ac6d11b8b17bb3a4f8bbe4f04e2e477063/packages/system/dns-server/dns-server.yaml
+    notice: null
   - id: external-secrets
     name: External Secrets Operator
     section: dependencies
@@ -345,24 +352,24 @@ components:
       - upstream-chart
     protected: true
     description: External Secrets Operator synchronizes secrets from external APIs (HashiCorp Vault, AWS Secrets
-    primaryChart: &a25
+    primaryChart: &a27
       name: external-secrets
       version: 0.15.1
       repository: https://charts.external-secrets.io
       origin: upstream
     primaryImage: null
     charts:
-      - *a25
+      - *a27
     images: []
     modules:
       - name: main
         charts:
-          - *a25
+          - *a27
         images: []
     links:
       upstream: https://external-secrets.io
-      source: https://github.com/OKDP/sandbox-dependencies/blob/main/packages/system/external-secrets/external-secrets.yaml
-    logo: null
+      source: https://github.com/OKDP/sandbox-dependencies/blob/12bb63ac6d11b8b17bb3a4f8bbe4f04e2e477063/packages/system/external-secrets/external-secrets.yaml
+    notice: null
   - id: vault
     name: HashiCorp Vault
     section: dependencies
@@ -375,24 +382,24 @@ components:
       - upstream-chart
     protected: true
     description: HashiCorp Vault, the secret backend a SecretStore points at. Runs in dev mode by default,
-    primaryChart: &a26
+    primaryChart: &a28
       name: vault
       version: 0.29.1
       repository: https://helm.releases.hashicorp.com
       origin: upstream
     primaryImage: null
     charts:
-      - *a26
+      - *a28
     images: []
     modules:
       - name: main
         charts:
-          - *a26
+          - *a28
         images: []
     links:
       upstream: https://www.vaultproject.io
-      source: https://github.com/OKDP/sandbox-dependencies/blob/main/packages/system/vault/vault.yaml
-    logo: null
+      source: https://github.com/OKDP/sandbox-dependencies/blob/12bb63ac6d11b8b17bb3a4f8bbe4f04e2e477063/packages/system/vault/vault.yaml
+    notice: null
   - id: hive-metastore
     name: Hive Metastore
     section: data-services
@@ -406,28 +413,28 @@ components:
       - okdp-image
     protected: false
     description: Hive Metastore is a centralized metadata repository for data lakes and big data analytics.
-    primaryChart: &a27
+    primaryChart: &a29
       name: hive-metastore
       version: 1.4.0
       repository: quay.io/okdp/charts/hive-metastore
       origin: okdp
-    primaryImage: &a28
+    primaryImage: &a30
       repository: quay.io/okdp/hive-metastore
       tag: 4.0.1
     charts:
-      - *a27
+      - *a29
     images:
-      - *a28
+      - *a30
     modules:
       - name: main
         charts:
-          - *a27
+          - *a29
         images:
-          - *a28
+          - *a30
     links:
       upstream: https://hive.apache.org
-      source: https://github.com/OKDP/platform-packages/blob/main/packages/services/hive-metastore/hive-metastore.yaml
-    logo: null
+      source: https://github.com/OKDP/platform-packages/blob/082e702722bcc395a2930bbd46f732c4486041c4/packages/services/hive-metastore/hive-metastore.yaml
+    notice: null
   - id: ingress-nginx
     name: Ingress NGINX
     section: dependencies
@@ -440,24 +447,26 @@ components:
       - upstream-chart
     protected: false
     description: NGINX Ingress Controller for Kubernetes with support for multiple deployment modes
-    primaryChart: &a29
+    primaryChart: &a31
       name: ingress-nginx
       version: 4.12.1
       repository: https://kubernetes.github.io/ingress-nginx
       origin: upstream
     primaryImage: null
     charts:
-      - *a29
+      - *a31
     images: []
     modules:
       - name: main
         charts:
-          - *a29
+          - *a31
         images: []
     links:
       upstream: https://github.com/kubernetes/ingress-nginx
-      source: https://github.com/OKDP/sandbox-dependencies/blob/main/packages/system/ingress-nginx/ingress-nginx.yaml
-    logo: null
+      source: https://github.com/OKDP/sandbox-dependencies/blob/12bb63ac6d11b8b17bb3a4f8bbe4f04e2e477063/packages/system/ingress-nginx/ingress-nginx.yaml
+    notice:
+      level: warning
+      key: ingress-nginx-retired
   - id: jupyterhub
     name: JupyterHub
     section: data-services
@@ -471,62 +480,62 @@ components:
       - okdp-image
     protected: false
     description: Multi-user interactive development environment for data science and machine learning.
-    primaryChart: &a30
+    primaryChart: &a32
       name: jupyterhub
       version: 4.3.3
       repository: https://hub.jupyter.org/helm-chart/
       origin: upstream
-    primaryImage: &a31
+    primaryImage: &a33
       repository: quay.io/okdp/jupyter/minimal-notebook
       tag: python-3.12.12-hub-5.4.2-lab-4.5.0
     charts:
-      - &a32
+      - &a34
         name: oidc-client
         version: null
         repository: null
         origin: local
-      - &a33
+      - &a35
         name: spark-rbac
         version: 1.0.1
         repository: quay.io/okdp/charts/spark-rbac
         origin: okdp
-      - *a30
+      - *a32
     images:
-      - *a31
-      - &a34
+      - *a33
+      - &a36
         repository: quay.io/okdp/jupyter/scipy-notebook
         tag: python-3.12.12-hub-5.4.2-lab-4.5.0
-      - &a35
+      - &a37
         repository: quay.io/okdp/jupyter/datascience-notebook
         tag: python-3.12.12-hub-5.4.2-lab-4.5.0
-      - &a36
+      - &a38
         repository: quay.io/okdp/jupyter/all-spark-notebook
         tag: spark-3.4.4-python-3.11-java-17-scala-2.12
-      - &a37
+      - &a39
         repository: quay.io/okdp/jupyter/all-spark-notebook
         tag: spark-3.5.6-python-3.11-java-17-scala-2.12
     modules:
       - name: oidc-client
         charts:
-          - *a32
+          - *a34
         images: []
       - name: spark-rbac
         charts:
-          - *a33
+          - *a35
         images: []
       - name: main
         charts:
-          - *a30
+          - *a32
         images:
-          - *a31
-          - *a34
-          - *a35
+          - *a33
           - *a36
           - *a37
+          - *a38
+          - *a39
     links:
       upstream: https://jupyter.org
-      source: https://github.com/OKDP/platform-packages/blob/main/packages/services/jupyterhub/jupyterhub.yaml
-    logo: jupyter.svg
+      source: https://github.com/OKDP/platform-packages/blob/082e702722bcc395a2930bbd46f732c4486041c4/packages/services/jupyterhub/jupyterhub.yaml
+    notice: null
   - id: keycloak
     name: Keycloak
     section: dependencies
@@ -540,32 +549,32 @@ components:
       - okdp-image
     protected: false
     description: Keycloak identity and access management for Kubernetes
-    primaryChart: &a38
+    primaryChart: &a40
       name: keycloak
       version: 24.4.11
       repository: registry-1.docker.io/bitnamicharts/keycloak
       origin: upstream
-    primaryImage: &a39
-      repository: okdp/sandbox-images/keycloak
+    primaryImage: &a41
+      repository: quay.io/okdp/sandbox-images/keycloak
       tag: 26.1.3-debian-12-r0
     charts:
-      - *a38
+      - *a40
     images:
-      - *a39
-      - &a40
-        repository: okdp/sandbox-images/keycloak-config-cli
+      - *a41
+      - &a42
+        repository: quay.io/okdp/sandbox-images/keycloak-config-cli
         tag: 6.4.0-debian-12-r0
     modules:
       - name: main
         charts:
-          - *a38
-        images:
-          - *a39
           - *a40
+        images:
+          - *a41
+          - *a42
     links:
       upstream: https://www.keycloak.org
-      source: https://github.com/OKDP/sandbox-dependencies/blob/main/packages/system/keycloak/keycloak.yaml
-    logo: null
+      source: https://github.com/OKDP/sandbox-dependencies/blob/12bb63ac6d11b8b17bb3a4f8bbe4f04e2e477063/packages/system/keycloak/keycloak.yaml
+    notice: null
   - id: kubauth
     name: kubauth
     section: dependencies
@@ -578,24 +587,24 @@ components:
       - upstream-chart
     protected: false
     description: OIDC authentication for kubectl against the platform identity provider.
-    primaryChart: &a41
+    primaryChart: &a43
       name: kubauth
       version: 0.3.0-snapshot
       repository: quay.io/kubauth/charts/kubauth
       origin: upstream
     primaryImage: null
     charts:
-      - *a41
+      - *a43
     images: []
     modules:
       - name: main
         charts:
-          - *a41
+          - *a43
         images: []
     links:
       upstream: null
-      source: https://github.com/OKDP/sandbox-dependencies/blob/main/packages/system/kubauth/kubauth.yaml
-    logo: null
+      source: https://github.com/OKDP/sandbox-dependencies/blob/12bb63ac6d11b8b17bb3a4f8bbe4f04e2e477063/packages/system/kubauth/kubauth.yaml
+    notice: null
   - id: kubocd-webhooks
     name: KuboCD webhooks
     section: dependencies
@@ -608,24 +617,24 @@ components:
       - upstream-chart
     protected: true
     description: Admission webhooks backing the KuboCD Release and Context resources.
-    primaryChart: &a42
+    primaryChart: &a44
       name: kubocd-wh
       version: v0.3.2
       repository: quay.io/kubocd/charts/kubocd-wh
       origin: upstream
     primaryImage: null
     charts:
-      - *a42
+      - *a44
     images: []
     modules:
       - name: main
         charts:
-          - *a42
+          - *a44
         images: []
     links:
       upstream: null
-      source: https://github.com/OKDP/sandbox-dependencies/blob/main/packages/system/kubocd-webhooks/webhooks.yaml
-    logo: null
+      source: https://github.com/OKDP/sandbox-dependencies/blob/12bb63ac6d11b8b17bb3a4f8bbe4f04e2e477063/packages/system/kubocd-webhooks/webhooks.yaml
+    notice: null
   - id: local-secrets-provider
     name: Local secrets provider
     section: dependencies
@@ -638,24 +647,24 @@ components:
       - okdp-chart
     protected: false
     description: Generates sandbox credentials in-cluster, standing in for a real vault.
-    primaryChart: &a43
+    primaryChart: &a45
       name: local-secrets-provider
       version: 0.1.0
       repository: quay.io/okdp/charts/local-secrets-provider
       origin: okdp
     primaryImage: null
     charts:
-      - *a43
+      - *a45
     images: []
     modules:
       - name: main
         charts:
-          - *a43
+          - *a45
         images: []
     links:
       upstream: null
-      source: https://github.com/OKDP/sandbox-dependencies/blob/main/packages/system/local-secrets-provider/local-secrets-provider.yaml
-    logo: null
+      source: https://github.com/OKDP/sandbox-dependencies/blob/12bb63ac6d11b8b17bb3a4f8bbe4f04e2e477063/packages/system/local-secrets-provider/local-secrets-provider.yaml
+    notice: null
   - id: okdp-control-plane-ui
     name: OKDP Control Plane Console
     section: control-plane
@@ -668,24 +677,24 @@ components:
       - okdp-chart
     protected: false
     description: Frontend web interface for the Open Kubernetes Data Platform
-    primaryChart: &a44
+    primaryChart: &a46
       name: okdp-control-plane-ui
       version: 0.7.0
       repository: quay.io/okdp/charts/okdp-control-plane-ui
       origin: okdp
     primaryImage: null
     charts:
-      - *a44
+      - *a46
     images: []
     modules:
       - name: main
         charts:
-          - *a44
+          - *a46
         images: []
     links:
       upstream: https://github.com/OKDP/okdp-control-plane-ui
-      source: https://github.com/OKDP/platform-packages/blob/main/packages/system/okdp-control-plane-ui/okdp-control-plane-ui.yaml
-    logo: null
+      source: https://github.com/OKDP/platform-packages/blob/082e702722bcc395a2930bbd46f732c4486041c4/packages/system/okdp-control-plane-ui/okdp-control-plane-ui.yaml
+    notice: null
   - id: okdp-control-plane-server
     name: OKDP Control Plane Server
     section: control-plane
@@ -698,24 +707,24 @@ components:
       - okdp-chart
     protected: false
     description: API backend for the Open Kubernetes Data Platform
-    primaryChart: &a45
+    primaryChart: &a47
       name: okdp-control-plane-server
       version: 0.7.1
       repository: quay.io/okdp/charts/okdp-control-plane-server
       origin: okdp
     primaryImage: null
     charts:
-      - *a45
+      - *a47
     images: []
     modules:
       - name: main
         charts:
-          - *a45
+          - *a47
         images: []
     links:
       upstream: https://github.com/OKDP/okdp-control-plane-server
-      source: https://github.com/OKDP/platform-packages/blob/main/packages/system/okdp-control-plane-server/okdp-control-plane-server.yaml
-    logo: null
+      source: https://github.com/OKDP/platform-packages/blob/082e702722bcc395a2930bbd46f732c4486041c4/packages/system/okdp-control-plane-server/okdp-control-plane-server.yaml
+    notice: null
   - id: okdp-examples
     name: OKDP Examples
     section: data-services
@@ -729,28 +738,28 @@ components:
       - okdp-image
     protected: false
     description: Reference notebooks, datasets and OPA policies used by the sandbox.
-    primaryChart: &a46
+    primaryChart: &a48
       name: okdp-examples
       version: 1.3.0
       repository: quay.io/okdp/charts/okdp-examples
       origin: okdp
-    primaryImage: &a47
+    primaryImage: &a49
       repository: quay.io/okdp/okdp-examples
       tag: 1.2.0
     charts:
-      - *a46
+      - *a48
     images:
-      - *a47
+      - *a49
     modules:
       - name: main
         charts:
-          - *a46
+          - *a48
         images:
-          - *a47
+          - *a49
     links:
       upstream: https://github.com/OKDP/okdp-examples
-      source: https://github.com/OKDP/platform-packages/blob/main/packages/services/okdp-examples/okdp-examples.yaml
-    logo: null
+      source: https://github.com/OKDP/platform-packages/blob/082e702722bcc395a2930bbd46f732c4486041c4/packages/services/okdp-examples/okdp-examples.yaml
+    notice: null
   - id: tools
     name: Platform tools
     section: dependencies
@@ -763,20 +772,20 @@ components:
       - upstream-chart
     protected: false
     description: Reloader, kubernetes-replicator and secret-generator, bundled as one package.
-    primaryChart: &a48
+    primaryChart: &a50
       name: reloader
       version: 1.0.72
       repository: https://stakater.github.io/stakater-charts
       origin: upstream
     primaryImage: null
     charts:
-      - *a48
-      - &a49
+      - *a50
+      - &a51
         name: kubernetes-replicator
         version: 2.9.2
         repository: https://helm.mittwald.de
         origin: upstream
-      - &a50
+      - &a52
         name: kubernetes-secret-generator
         version: 3.4.0
         repository: https://helm.mittwald.de
@@ -785,20 +794,20 @@ components:
     modules:
       - name: reloader
         charts:
-          - *a48
+          - *a50
         images: []
       - name: replicator
         charts:
-          - *a49
+          - *a51
         images: []
       - name: secret-generator
         charts:
-          - *a50
+          - *a52
         images: []
     links:
       upstream: null
-      source: https://github.com/OKDP/sandbox-dependencies/blob/main/packages/system/tools/tools.yaml
-    logo: null
+      source: https://github.com/OKDP/sandbox-dependencies/blob/12bb63ac6d11b8b17bb3a4f8bbe4f04e2e477063/packages/system/tools/tools.yaml
+    notice: null
   - id: cnpg-postgresql
     name: PostgreSQL
     section: dependencies
@@ -811,24 +820,28 @@ components:
       - okdp-chart
     protected: false
     description: PostgreSQL clusters provisioned through CloudNativePG.
-    primaryChart: &a51
+    primaryChart: &a53
       name: cnpg-postgresql
       version: 0.1.0
       repository: quay.io/okdp/charts/cnpg-postgresql
       origin: okdp
-    primaryImage: null
+    primaryImage: &a54
+      repository: ghcr.io/cloudnative-pg/postgresql
+      tag: "18.3"
     charts:
-      - *a51
-    images: []
+      - *a53
+    images:
+      - *a54
     modules:
       - name: main
         charts:
-          - *a51
-        images: []
+          - *a53
+        images:
+          - *a54
     links:
       upstream: https://www.postgresql.org
-      source: https://github.com/OKDP/sandbox-dependencies/blob/main/packages/system/cnpg-postgresql/cnpg-postgresql.yaml
-    logo: null
+      source: https://github.com/OKDP/sandbox-dependencies/blob/12bb63ac6d11b8b17bb3a4f8bbe4f04e2e477063/packages/system/cnpg-postgresql/cnpg-postgresql.yaml
+    notice: null
   - id: seaweedfs
     name: SeaweedFS
     section: dependencies
@@ -841,20 +854,20 @@ components:
       - upstream-chart
     protected: false
     description: S3-compatible object store backing the lakehouse in the sandbox.
-    primaryChart: &a52
+    primaryChart: &a55
       name: seaweedfs
       version: 4.17.0
       repository: https://seaweedfs.github.io/seaweedfs/helm
       origin: upstream
     primaryImage: null
     charts:
-      - &a53
+      - &a56
         name: seaweedfs-auth-config
         version: 1.1.0
         repository: quay.io/okdp/charts/seaweedfs-auth-config
         origin: okdp
-      - *a52
-      - &a54
+      - *a55
+      - &a57
         name: seaweedfs-provisioning
         version: 1.0.0
         repository: quay.io/okdp/charts/seaweedfs-provisioning
@@ -863,20 +876,20 @@ components:
     modules:
       - name: auth-config
         charts:
-          - *a53
+          - *a56
         images: []
       - name: main
         charts:
-          - *a52
+          - *a55
         images: []
       - name: provisioning
         charts:
-          - *a54
+          - *a57
         images: []
     links:
       upstream: https://github.com/seaweedfs/seaweedfs
-      source: https://github.com/OKDP/sandbox-dependencies/blob/main/packages/services/seaweedfs/seaweedfs.yaml
-    logo: null
+      source: https://github.com/OKDP/sandbox-dependencies/blob/12bb63ac6d11b8b17bb3a4f8bbe4f04e2e477063/packages/services/seaweedfs/seaweedfs.yaml
+    notice: null
   - id: spark-defaults
     name: Spark Defaults
     section: data-services
@@ -889,24 +902,24 @@ components:
       - okdp-chart
     protected: false
     description: Shared Spark configuration applied to every Spark application.
-    primaryChart: &a55
+    primaryChart: &a58
       name: spark-defaults
       version: 1.0.0
       repository: quay.io/okdp/charts/spark-defaults
       origin: okdp
     primaryImage: null
     charts:
-      - *a55
+      - *a58
     images: []
     modules:
       - name: main
         charts:
-          - *a55
+          - *a58
         images: []
     links:
       upstream: null
-      source: https://github.com/OKDP/platform-packages/blob/main/packages/services/spark-defaults/spark-defaults.yaml
-    logo: null
+      source: https://github.com/OKDP/platform-packages/blob/082e702722bcc395a2930bbd46f732c4486041c4/packages/services/spark-defaults/spark-defaults.yaml
+    notice: null
   - id: spark-history-server
     name: Spark History Server
     section: data-services
@@ -917,35 +930,44 @@ components:
       tag: 3.5.1-p08
     provenance:
       - okdp-chart
+      - okdp-image
     protected: false
     description: Monitoring and debugging interface for Apache Spark applications.
-    primaryChart: &a56
+    primaryChart: &a59
       name: spark-history-server
       version: 1.0.0
       repository: quay.io/okdp/charts/spark-history-server
       origin: okdp
-    primaryImage: null
+    primaryImage: &a60
+      repository: quay.io/okdp/spark
+      tag: spark-3.5.6-scala-2.12-java-17
     charts:
-      - *a56
-      - &a57
+      - *a59
+      - &a61
         name: spark-web-proxy
         version: 0.1.0
         repository: quay.io/okdp/charts/spark-web-proxy
         origin: okdp
-    images: []
+    images:
+      - *a60
+      - &a62
+        repository: quay.io/okdp/spark-web-proxy
+        tag: 0.2.1
     modules:
       - name: main
         charts:
-          - *a56
-        images: []
+          - *a59
+        images:
+          - *a60
       - name: proxy
         charts:
-          - *a57
-        images: []
+          - *a61
+        images:
+          - *a62
     links:
       upstream: https://spark.apache.org
-      source: https://github.com/OKDP/platform-packages/blob/main/packages/services/spark-history-server/spark-history-server.yaml
-    logo: spark.svg
+      source: https://github.com/OKDP/platform-packages/blob/082e702722bcc395a2930bbd46f732c4486041c4/packages/services/spark-history-server/spark-history-server.yaml
+    notice: null
   - id: spark-operator
     name: Spark Operator
     section: data-services
@@ -958,24 +980,24 @@ components:
       - upstream-chart
     protected: false
     description: Spark Operator 2.4.0 - Kubernetes operator for managing Apache Spark applications
-    primaryChart: &a58
+    primaryChart: &a63
       name: spark-operator
       version: 2.4.0
       repository: https://kubeflow.github.io/spark-operator
       origin: upstream
     primaryImage: null
     charts:
-      - *a58
+      - *a63
     images: []
     modules:
       - name: noname
         charts:
-          - *a58
+          - *a63
         images: []
     links:
       upstream: https://github.com/kubeflow/spark-operator
-      source: https://github.com/OKDP/platform-packages/blob/main/packages/services/spark-operator/spark-operator.yaml
-    logo: spark.svg
+      source: https://github.com/OKDP/platform-packages/blob/082e702722bcc395a2930bbd46f732c4486041c4/packages/services/spark-operator/spark-operator.yaml
+    notice: null
   - id: spark-rbac
     name: Spark RBAC
     section: data-services
@@ -988,24 +1010,24 @@ components:
       - okdp-chart
     protected: false
     description: Namespace roles and bindings letting Spark applications run in a project.
-    primaryChart: &a59
+    primaryChart: &a64
       name: spark-rbac
       version: 1.0.1
       repository: quay.io/okdp/charts/spark-rbac
       origin: okdp
     primaryImage: null
     charts:
-      - *a59
+      - *a64
     images: []
     modules:
       - name: main
         charts:
-          - *a59
+          - *a64
         images: []
     links:
       upstream: null
-      source: https://github.com/OKDP/platform-packages/blob/main/packages/services/spark-rbac/spark-rbac.yaml
-    logo: spark.svg
+      source: https://github.com/OKDP/platform-packages/blob/082e702722bcc395a2930bbd46f732c4486041c4/packages/services/spark-rbac/spark-rbac.yaml
+    notice: null
   - id: trino
     name: Trino
     section: data-services
@@ -1018,82 +1040,82 @@ components:
       - upstream-chart
     protected: false
     description: Distributed SQL query engine designed for large-scale data processing across multiple data sources.
-    primaryChart: &a60
+    primaryChart: &a65
       name: trino
       version: v1.42.1
       repository: https://trinodb.github.io/charts/
       origin: upstream
-    primaryImage: &a61
-      repository: trinodb/trino
+    primaryImage: &a66
+      repository: docker.io/trinodb/trino
       tag: "480"
     charts:
-      - &a62
+      - &a67
         name: internal-secrets
         version: null
         repository: null
         origin: local
-      - &a63
+      - &a68
         name: opa-kube-mgmt
         version: 11.0.7
         repository: https://open-policy-agent.github.io/kube-mgmt/charts
         origin: upstream
-      - &a65
+      - &a70
         name: opal-secrets
         version: 0.1.1
         repository: quay.io/okdp/charts/opal-secrets
         origin: okdp
-      - &a66
+      - &a71
         name: opal
         version: 0.0.30
         repository: https://permitio.github.io/opal-helm-chart
         origin: upstream
-      - &a69
+      - &a74
         name: oidc-dcr
         version: 0.3.2
         repository: quay.io/adaltas/oidc-dcr
         origin: upstream
-      - *a60
+      - *a65
     images:
-      - &a64
-        repository: openpolicyagent/opa
+      - &a69
+        repository: docker.io/openpolicyagent/opa
         tag: 1.16.1
-      - &a67
-        repository: permitio/opal-client-standalone
+      - &a72
+        repository: docker.io/permitio/opal-client-standalone
         tag: 0.9.4
-      - &a68
-        repository: permitio/opal-server
+      - &a73
+        repository: docker.io/permitio/opal-server
         tag: 0.9.4
-      - *a61
+      - *a66
     modules:
       - name: internal-secrets
         charts:
-          - *a62
+          - *a67
         images: []
       - name: opa
         charts:
-          - *a63
+          - *a68
         images:
-          - *a64
+          - *a69
       - name: opal-secrets
         charts:
-          - *a65
+          - *a70
         images: []
       - name: opal
         charts:
-          - *a66
+          - *a71
         images:
-          - *a67
-          - *a68
+          - *a72
+          - *a73
       - name: oidc-dcr
         charts:
-          - *a69
+          - *a74
         images: []
       - name: main
         charts:
-          - *a60
+          - *a65
         images:
-          - *a61
+          - *a66
     links:
       upstream: https://trino.io
-      source: https://github.com/OKDP/platform-packages/blob/main/packages/services/trino/trino.yaml
-    logo: trino.svg
+      source: https://github.com/OKDP/platform-packages/blob/082e702722bcc395a2930bbd46f732c4486041c4/packages/services/trino/trino.yaml
+    notice: null
