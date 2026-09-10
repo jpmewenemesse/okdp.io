@@ -61,7 +61,7 @@ const REPOS = {
 };
 
 const OKDP_CHART_PREFIXES = ["quay.io/okdp/charts/"];
-const OKDP_IMAGE_PREFIXES = ["quay.io/okdp/", "okdp/"];
+const OKDP_IMAGE_PREFIXES = ["quay.io/okdp/"];
 
 // ---------------------------------------------------------------- arguments
 
@@ -206,6 +206,26 @@ function walk(dir) {
 // --------------------------------------------------------------- extraction
 
 /**
+ * Expands an image repository to its fully-qualified form.
+ *
+ * A reference on the page reads as something to `docker pull`, so it has to name
+ * its registry. Manifests leave that implicit three different ways: an explicit
+ * `registry:` key beside `repository:`, a Docker Hub namespace (`trinodb/trino`),
+ * or a bare official image (`postgres`). Only the first is dangerous - dropping
+ * an explicit `quay.io` produces a Docker Hub path that resolves to nothing.
+ */
+function qualify(repository, registry) {
+  if (registry) return `${registry.replace(/\/$/, "")}/${repository}`;
+  const [head] = repository.split("/");
+  if (head.includes(".") || head.includes(":") || head === "localhost") {
+    return repository;
+  }
+  return repository.includes("/")
+    ? `docker.io/${repository}`
+    : `docker.io/library/${repository}`;
+}
+
+/**
  * Pulls chart and image coordinates out of one module. A module's `values` is
  * a Go template rather than YAML, so images are matched textually.
  */
@@ -243,17 +263,29 @@ function readModule(module) {
   }
 
   const values = typeof module.values === "string" ? module.values : "";
-  for (const [, repository, tag] of values.matchAll(
-    /repository:\s*"?([\w./-]+)"?\s*\n\s*tag:\s*"?([\w.-]+)"?/g,
+  // Charts split the host from the path (`registry:` + `repository:`, the
+  // Bitnami convention) as often as they inline it. Dropping the host silently
+  // turns a quay.io path into a Docker Hub one that does not exist.
+  //
+  // `tag:` is not always the next line either. `pullPolicy:` sits between the
+  // two often enough that requiring adjacency dropped five images, the Polaris
+  // server and the CloudNativePG operator among them. Intervening keys are
+  // allowed, but not another `repository:`, so two adjacent image blocks can
+  // never be paired across.
+  for (const [, registry, repository, tag] of values.matchAll(
+    /(?:registry:\s*"?([\w.:-]+)"?\s*\n\s*)?repository:\s*"?([\w./-]+)"?[ \t]*\n(?:[ \t]*(?!repository:|tag:)[\w.-]+:[^\n]*\n){0,4}\s*tag:\s*"?([\w.-]+)"?/g,
   )) {
-    entry.images.push({ repository, tag: String(tag) });
+    entry.images.push({
+      repository: qualify(repository, registry),
+      tag: String(tag),
+    });
   }
   for (const [, ref] of values.matchAll(
     /image:\s*"?([\w./-]+:[\w.-]+)"?\s*$/gm,
   )) {
     const index = ref.lastIndexOf(":");
     entry.images.push({
-      repository: ref.slice(0, index),
+      repository: qualify(ref.slice(0, index)),
       tag: ref.slice(index + 1),
     });
   }
@@ -426,8 +458,9 @@ function collect(sources, metadata) {
         ),
         links: {
           upstream: meta.upstream ?? null,
-          source: `https://github.com/OKDP/${repoName}/blob/main/${relative(sources[repoName].path, file)}`,
+          source: `https://github.com/OKDP/${repoName}/blob/${sources[repoName].head}/${relative(sources[repoName].path, file)}`,
         },
+        notice: meta.notice ?? null,
       });
     }
   }

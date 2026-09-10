@@ -7,6 +7,12 @@ export type Provenance = "upstream-chart" | "okdp-chart" | "okdp-image";
 
 export type SectionId = "data-services" | "control-plane" | "dependencies";
 
+/** A curated caveat about a component, keyed into the locale files. */
+export interface Notice {
+  level: "info" | "warning";
+  key: string;
+}
+
 export interface ChartRef {
   name: string;
   version: string | null;
@@ -42,6 +48,7 @@ export interface StackComponent {
   images: ImageRef[];
   modules: ModuleRef[];
   links: { upstream: string | null; source: string };
+  notice: Notice | null;
 }
 
 export interface StackSource {
