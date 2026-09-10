@@ -646,11 +646,15 @@
       "empty": "Aucun composant ne correspond à ce filtre."
     },
     "details": {
-      "modules": "Modules inclus",
+      "references": "R\u00e9f\u00e9rences incluses",
       "source": "Définition du package",
       "upstream": "Projet"
     },
-    "badges": { "prerelease": "Pré-version" },
+    "notices": {
+      "ingress-nginx-retired": {
+        "text": "Le projet Kubernetes a mis fin \u00e0 Ingress NGINX en mars 2026 : plus aucune version, correction de bogue ni mise \u00e0 jour de s\u00e9curit\u00e9. OKDP 1.0 l\u2019embarque d\u00e9lib\u00e9r\u00e9ment et les d\u00e9ploiements existants continuent de fonctionner. La strat\u00e9gie de migration, Gateway API ou un autre contr\u00f4leur, sera d\u00e9cid\u00e9e apr\u00e8s la 1.0."
+      }
+    },
     "copy": { "label": "Copier", "done": "Copié" },
     "index": {
       "meta": {

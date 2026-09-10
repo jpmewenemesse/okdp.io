@@ -1,7 +1,7 @@
 ---
 import ProvenanceBadge from "@/components/stack/ProvenanceBadge.astro";
 import type { HomeTranslations } from "@/i18n/translations";
-import type { LocalizedComponent } from "@/types/stack";
+import type { ChartRef, LocalizedComponent } from "@/types/stack";
 
 interface Props {
   component: LocalizedComponent;
@@ -13,25 +13,30 @@ const copy = content.stackPage;
 
 const packageRef = `${component.package.repository}:${component.package.tag}`;
 const chart = component.primaryChart;
-const isPrerelease = /-(snapshot|rc|alpha|beta|incubating)/i.test(
-  component.upstreamVersion,
-);
+const notice = component.notice
+  ? copy.notices[component.notice.key as keyof typeof copy.notices]
+  : null;
+// Every reference the package pulls in, flat and deduplicated. The module a
+// reference belongs to is structure, not identity, and the package definition
+// carries it authoritatively.
+//
+// A chart published to a registry is a complete reference on its own. One served
+// from a Helm repository is not, so the repository follows it: the reference and
+// its website, nothing else. Local charts are vendored in the package repo and
+// have no reference at all.
+const chartRef = (entry: ChartRef) =>
+  entry.repository!.startsWith("http")
+    ? `${entry.name}:${entry.version} (${entry.repository})`
+    : `${entry.repository}:${entry.version}`;
 
-// Helper modules only: the primary chart and image already have their own
-// columns, and repeating them in the detail panel reads as duplication.
-const extraModules = component.modules
-  .map((module) => ({
-    name: module.name,
-    charts: module.charts.filter(
-      (entry) => entry.version && entry.repository !== chart?.repository,
-    ),
-    images: module.images.filter(
-      (image) =>
-        image.repository !== component.primaryImage?.repository ||
-        image.tag !== component.primaryImage?.tag,
-    ),
-  }))
-  .filter((module) => module.charts.length > 0 || module.images.length > 0);
+const references = [
+  ...new Set([
+    ...component.charts
+      .filter((entry) => entry.version && entry.repository)
+      .map(chartRef),
+    ...component.images.map((image) => `${image.repository}:${image.tag}`),
+  ]),
+];
 
 // Everything a filter should match, lowercased once at build time.
 const haystack = [
@@ -93,6 +98,13 @@ const haystack = [
 
   <div class="bg-background-alt border-accent border-t px-4 py-4 md:ps-11">
     {
+      notice && (
+        <div class="mb-4 max-w-3xl rounded border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          {notice.text}
+        </div>
+      )
+    }
+    {
       component.description && (
         <p class="text-text-light mb-4 max-w-3xl text-sm">
           {component.description}
@@ -117,24 +129,14 @@ const haystack = [
     </div>
 
     {
-      extraModules.length > 0 && (
+      references.length > 0 && (
         <div class="mb-4">
           <h4 class="text-text-light mb-2 text-xs font-semibold tracking-wide uppercase">
-            {copy.details.modules}
+            {copy.details.references}
           </h4>
           <ul class="space-y-1">
-            {extraModules.map((module) => (
-              <li class="text-text-light font-mono text-xs">
-                <span class="text-text font-sans font-medium">
-                  {module.name}
-                </span>
-                {module.charts.map(
-                  (entry) => ` · ${entry.name} ${entry.version}`,
-                )}
-                {module.images.map(
-                  (image) => ` · ${image.repository}:${image.tag}`,
-                )}
-              </li>
+            {references.map((ref) => (
+              <li class="text-text-light font-mono text-xs break-all">{ref}</li>
             ))}
           </ul>
         </div>
